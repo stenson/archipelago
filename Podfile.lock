@@ -1,0 +1,13 @@
+PODS:
+  - AFNetworking (1.3.3)
+  - MBXMapKit (0.1.0)
+
+DEPENDENCIES:
+  - AFNetworking (~> 1.3.3)
+  - MBXMapKit
+
+SPEC CHECKSUMS:
+  AFNetworking: 0700ec7a58c36ad217173e167f6e4df7270df66b
+  MBXMapKit: e621aa3ab2c1925d2312ee293f3c147f837ac27c
+
+COCOAPODS: 0.20.2
