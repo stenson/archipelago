@@ -15,7 +15,7 @@
 
 #define ECHONEST_API_KEY @"HEJZB8PY3CZFC1I8R"
 
-@interface ADKViewController ()<UITableViewDelegate> {
+@interface ADKViewController ()<UITableViewDelegate, MKMapViewDelegate, UINavigationBarDelegate> {
     UINavigationBar *_navBar;
     BOOL _forceLayout;
     MKMapView *_map;
@@ -36,8 +36,8 @@
     _navBar = [[UINavigationBar alloc] initWithFrame:CGRectZero];
     _navBar.tintColor = [UIColor whiteColor];
     _navBar.barTintColor = [UIColor colorWithRed:1.0 green:0.5 blue:0.6 alpha:1.0];
+    _navBar.delegate = self;
     [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:@"Countries"] animated:NO];
-    //[_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:@"Artists"] animated:YES];
     
     UIFont *din = [UIFont fontWithName:@"AvenirNext-Regular" size:20.f];
     
@@ -53,6 +53,7 @@
     CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(19, -123);
     MKCoordinateRegion adjustedRegion = [_map regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 100, 100)];
     [_map setRegion:adjustedRegion animated:YES];
+    _map.delegate = self;
     
     _table = [[ADKCountriesTable alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     _table.delegate = self;
@@ -62,12 +63,12 @@
     [self.view addSubview:_navBar];
 }
 
-- (void)centerMap
+- (void)centerMapAnimated:(BOOL)animated
 {
     CLLocationCoordinate2D atlantic = CLLocationCoordinate2DMake(45.46, -30.78);
     MKCoordinateSpan span = MKCoordinateSpanMake(90.0, 90.0);
     MKCoordinateRegion region = MKCoordinateRegionMake(atlantic, span);
-    [_map setRegion:[_map regionThatFits:region] animated:NO];
+    [_map setRegion:[_map regionThatFits:region] animated:animated];
 }
 
 - (void)viewDidLayoutSubviews
@@ -81,7 +82,7 @@
         _table.frame = CGRectTake(self.view.bounds, -64.f, CGRectMaxYEdge);
         
         _map.frame = self.view.bounds;
-        [self centerMap];
+        [self centerMapAnimated:NO];
     }
 }
 
@@ -97,46 +98,81 @@
 
 - (void)addEchonestArtistResponseToMap:(NSDictionary *)response
 {
-//    NSArray *artists = response[@"response"][@"artists"];
-//    NSLog(@"%@", artists);
-//    
-//    CLLocation
+    NSArray *artists = response[@"response"][@"artists"];
+    
+    for (NSDictionary *artist in artists) {
+        [self performLocalSearchForNaturalLanguageQuery:artist[@"artist_location"][@"location"] completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
+            if (response) {
+                MKPointAnnotation *point = [[MKPointAnnotation alloc] init];
+                [point setCoordinate:response.boundingRegion.center];
+                [point setTitle:artist[@"name"]];
+                [_map addAnnotation:point];
+            } else {
+                NSLog(@"dud");
+            }
+        }];
+    }
+}
+
+- (void)performLocalSearchForNaturalLanguageQuery:(NSString *)nlQuery completionHandler:(MKLocalSearchCompletionHandler)completionHandler
+{
+    MKLocalSearchRequest *searchRequest = [[MKLocalSearchRequest alloc] init];
+    searchRequest.naturalLanguageQuery = nlQuery;
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:searchRequest];
+    [search startWithCompletionHandler:completionHandler];
 }
 
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
     NSString *country = [(ADKCountryCell *)[_table cellForRowAtIndexPath:indexPath] countryName];
     
-    [UIView animateWithDuration:0.33f delay:0.f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-        _table.transform = CGAffineTransformMakeTranslation(0.f, _table.frame.size.height);
-    } completion:nil];
+    NSArray *cells = [tableView visibleCells];
+    NSTimeInterval delay = 0.f;
+    for (UITableViewCell *cell in cells) {
+        [UIView animateWithDuration:0.25f delay:delay += 0.05f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            cell.transform = CGAffineTransformMakeTranslation(-cell.contentView.frame.size.width, 0.f);
+        } completion:nil];
+    }
     
     [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:country] animated:YES];
     
-    MKLocalSearchRequest *searchRequest = [[MKLocalSearchRequest alloc] init];
-    searchRequest.naturalLanguageQuery = country;
-    
-    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:searchRequest];
-    [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error) {
-        //MKMapItem *item = response.mapItems[0];
+    [self performLocalSearchForNaturalLanguageQuery:country completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
         [_map setRegion:response.boundingRegion animated:YES];
     }];
     
-//    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-//    NSDictionary *parameters = @{
-//        @"api_key": ECHONEST_API_KEY,
-//        @"format": @"json",
-//        @"artist_location": [NSString stringWithFormat:@"country:%@", country],
-//        @"bucket": @"artist_location",
-//    };
-//    
-//    [manager GET:@"http://developer.echonest.com/api/v4/artist/search" parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-//        [self addEchonestArtistResponseToMap:responseObject];
-//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-//        NSLog(@"Error: %@", error);
-//    }];
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    NSDictionary *parameters = @{
+        @"api_key": ECHONEST_API_KEY,
+        @"format": @"json",
+        @"artist_location": [NSString stringWithFormat:@"country:%@", country],
+        @"bucket": @"artist_location",
+    };
+    
+    [manager GET:@"http://developer.echonest.com/api/v4/artist/search" parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [self addEchonestArtistResponseToMap:responseObject];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", error);
+    }];
+}
+
+#pragma mark - UINavigationBarDelegate
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+{
+    [self centerMapAnimated:YES];
+    [_map removeAnnotations:[_map annotations]];
+    
+    NSArray *cells = [_table visibleCells];
+    NSTimeInterval delay = cells.count * 0.05f;
+    for (UITableViewCell *cell in cells) {
+        [UIView animateWithDuration:0.25f delay:delay -= 0.05f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            cell.transform = CGAffineTransformIdentity;
+        } completion:nil];
+    }
 }
 
 @end
