@@ -12,6 +12,7 @@
 #import "CGGeometryAdditions.h"
 #import "ADKCountriesTable.h"
 #import "ADKCountryCell.h"
+#import "ADKArtistsTable.h"
 
 #define ECHONEST_API_KEY @"HEJZB8PY3CZFC1I8R"
 
@@ -20,6 +21,7 @@
     BOOL _forceLayout;
     MKMapView *_map;
     ADKCountriesTable *_table;
+    ADKArtistsTable *_artists;
 }
 @end
 
@@ -35,7 +37,7 @@
     
     _navBar = [[UINavigationBar alloc] initWithFrame:CGRectZero];
     _navBar.tintColor = [UIColor whiteColor];
-    _navBar.barTintColor = [UIColor colorWithRed:1.0 green:0.5 blue:0.6 alpha:1.0];
+    _navBar.barTintColor = [UIColor colorWithRed:1.0 green:0.3 blue:0.4 alpha:1.0];
     _navBar.delegate = self;
     [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:@"Countries"] animated:NO];
     
@@ -58,7 +60,10 @@
     _table = [[ADKCountriesTable alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     _table.delegate = self;
     
+    _artists = [[ADKArtistsTable alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    
     [self.view addSubview:_map];
+    [self.view addSubview:_artists];
     [self.view addSubview:_table];
     [self.view addSubview:_navBar];
 }
@@ -80,6 +85,7 @@
         
         _navBar.frame = CGRectTake(self.view.bounds, 64.f, CGRectMinYEdge);
         _table.frame = CGRectTake(self.view.bounds, -64.f, CGRectMaxYEdge);
+        _artists.frame = _table.frame;
         
         _map.frame = self.view.bounds;
         [self centerMapAnimated:NO];
@@ -112,6 +118,8 @@
             }
         }];
     }
+    
+    _artists.artists = artists;
 }
 
 - (void)performLocalSearchForNaturalLanguageQuery:(NSString *)nlQuery completionHandler:(MKLocalSearchCompletionHandler)completionHandler
@@ -130,17 +138,29 @@
     
     NSString *country = [(ADKCountryCell *)[_table cellForRowAtIndexPath:indexPath] countryName];
     
+    UITableViewCell *selectedCell = [tableView cellForRowAtIndexPath:indexPath];
     NSArray *cells = [tableView visibleCells];
     NSTimeInterval delay = 0.f;
     for (UITableViewCell *cell in cells) {
-        [UIView animateWithDuration:0.25f delay:delay += 0.05f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-            cell.transform = CGAffineTransformMakeTranslation(-cell.contentView.frame.size.width, 0.f);
-        } completion:nil];
+        if (cell != selectedCell) {
+            [UIView animateWithDuration:0.25f delay:delay += 0.04f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+                cell.transform = CGAffineTransformMakeTranslation(-cell.contentView.frame.size.width, 0.f);
+            } completion:nil];
+        }
     }
+    
+    _table.userInteractionEnabled = NO;
+    [UIView animateWithDuration:0.33f delay:delay options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        _table.alpha = 0.f;
+    } completion:^(BOOL finished) {
+        _table.hidden = YES;
+    }];
     
     [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:country] animated:YES];
     
     [self performLocalSearchForNaturalLanguageQuery:country completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
+        MKCoordinateRegion region = response.boundingRegion;
+        region.span = MKCoordinateSpanMake(region.span.latitudeDelta * 2.f, region.span.longitudeDelta);
         [_map setRegion:response.boundingRegion animated:YES];
     }];
     
@@ -161,8 +181,17 @@
 
 #pragma mark - UINavigationBarDelegate
 
-- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
+    [_artists animateCellExits];
+    
+    _table.hidden = NO;
+    [UIView animateWithDuration:0.25f animations:^{
+        _table.alpha = 1.f;
+    } completion:^(BOOL finished) {
+        _table.userInteractionEnabled = YES;
+    }];
+    
     [self centerMapAnimated:YES];
     [_map removeAnnotations:[_map annotations]];
     
@@ -173,6 +202,30 @@
             cell.transform = CGAffineTransformIdentity;
         } completion:nil];
     }
+    return YES;
 }
+
+//- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+//{
+//    [_artists animateCellExits];
+//    
+//    _table.hidden = NO;
+//    [UIView animateWithDuration:0.25f animations:^{
+//        _table.alpha = 1.f;
+//    } completion:^(BOOL finished) {
+//        _table.userInteractionEnabled = YES;
+//    }];
+//    
+//    [self centerMapAnimated:YES];
+//    [_map removeAnnotations:[_map annotations]];
+//    
+//    NSArray *cells = [_table visibleCells];
+//    NSTimeInterval delay = cells.count * 0.05f;
+//    for (UITableViewCell *cell in cells) {
+//        [UIView animateWithDuration:0.25f delay:delay -= 0.05f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+//            cell.transform = CGAffineTransformIdentity;
+//        } completion:nil];
+//    }
+//}
 
 @end

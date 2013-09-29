@@ -19,16 +19,19 @@ PODS:
   - AFNetworking/Serialization (2.0.0)
   - AFNetworking/UIKit (2.0.0):
     - AFNetworking/NSURLConnection
+  - Archimedes (1.0)
   - MBXMapKit (0.1.0)
   - Reveal-iOS-SDK (0.9.1)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.0)
+  - Archimedes
   - MBXMapKit
   - Reveal-iOS-SDK
 
 SPEC CHECKSUMS:
   AFNetworking: 3fa983b1beaba69566a3374612511e2a6e3fe845
+  Archimedes: 4ddf6dbc4defcdf7484ff2aee92179c7dd40c99d
   MBXMapKit: e621aa3ab2c1925d2312ee293f3c147f837ac27c
   Reveal-iOS-SDK: 7396a20e743807b1e6f1caae664e1a9dc0cc442c
 

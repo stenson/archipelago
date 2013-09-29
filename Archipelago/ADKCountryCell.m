@@ -13,10 +13,7 @@
 
 + (CGRect)boundingRectForWidth:(CGFloat)width attributedCountryName:(NSAttributedString *)attributedCountryName
 {
-    CGRect rect = [attributedCountryName boundingRectWithSize:CGSizeMake(width, 300.f) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil];
-    
-    //NSLog(@"%@ / %@", attributedCountryName.string, NSStringFromCGRect(rect));
-    return rect;
+    return [attributedCountryName boundingRectWithSize:CGSizeMake(width, 300.f) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil];
 }
 
 + (NSAttributedString *)attributedStringForCountryName:(NSString *)countryName
@@ -34,7 +31,7 @@
     if (self) {
         self.selectedBackgroundView = [[UIView alloc] init];
         self.selectedBackgroundView.backgroundColor = [UIColor whiteColor];
-        self.contentView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5f];
+        self.contentView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.95f];
     }
     return self;
 }

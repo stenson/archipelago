@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		85F01FA2C58041B0A1162B74 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 81551A6CAB3D4E1AAE8840C8 /* libPods.a */; };
+		98712F5517F8B6E300727105 /* ADKArtistCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 98712F5417F8B6E300727105 /* ADKArtistCell.m */; };
+		987DE72517F8B37A0036D5D8 /* ADKArtistsTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 987DE72417F8B37A0036D5D8 /* ADKArtistsTable.m */; };
 		98E4361217F5BC40000B7157 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98E4361117F5BC40000B7157 /* Foundation.framework */; };
 		98E4361417F5BC40000B7157 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98E4361317F5BC40000B7157 /* CoreGraphics.framework */; };
 		98E4361617F5BC40000B7157 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98E4361517F5BC40000B7157 /* UIKit.framework */; };
@@ -42,6 +44,10 @@
 /* Begin PBXFileReference section */
 		2CDC971D89F54B729C96F697 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		81551A6CAB3D4E1AAE8840C8 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		98712F5317F8B6E300727105 /* ADKArtistCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADKArtistCell.h; sourceTree = "<group>"; };
+		98712F5417F8B6E300727105 /* ADKArtistCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADKArtistCell.m; sourceTree = "<group>"; };
+		987DE72317F8B37A0036D5D8 /* ADKArtistsTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADKArtistsTable.h; sourceTree = "<group>"; };
+		987DE72417F8B37A0036D5D8 /* ADKArtistsTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADKArtistsTable.m; sourceTree = "<group>"; };
 		98E4360E17F5BC40000B7157 /* Archipelago.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Archipelago.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98E4361117F5BC40000B7157 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		98E4361317F5BC40000B7157 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -182,6 +188,10 @@
 				98E4365017F5DE3F000B7157 /* ADKCountriesTable.m */,
 				98E4365417F60C8F000B7157 /* ADKCountryCell.h */,
 				98E4365517F60C8F000B7157 /* ADKCountryCell.m */,
+				987DE72317F8B37A0036D5D8 /* ADKArtistsTable.h */,
+				987DE72417F8B37A0036D5D8 /* ADKArtistsTable.m */,
+				98712F5317F8B6E300727105 /* ADKArtistCell.h */,
+				98712F5417F8B6E300727105 /* ADKArtistCell.m */,
 			);
 			name = Interface;
 			sourceTree = "<group>";
@@ -335,6 +345,8 @@
 				98E4361E17F5BC40000B7157 /* main.m in Sources */,
 				98E4365117F5DE3F000B7157 /* ADKCountriesTable.m in Sources */,
 				98E4365617F60C8F000B7157 /* ADKCountryCell.m in Sources */,
+				987DE72517F8B37A0036D5D8 /* ADKArtistsTable.m in Sources */,
+				98712F5517F8B6E300727105 /* ADKArtistCell.m in Sources */,
 				98E4362217F5BC40000B7157 /* ADKAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
