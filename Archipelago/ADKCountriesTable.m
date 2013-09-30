@@ -28,6 +28,7 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.showsVerticalScrollIndicator = NO;
         self.dataSource = self;
+        self.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 100.f)];
         
         [self registerClass:[ADKCountryCell class] forCellReuseIdentifier:REUSE];
         _countries = [self countriesFromJSON];

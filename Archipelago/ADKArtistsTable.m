@@ -28,6 +28,7 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.dataSource = self;
         self.delegate = self;
+        self.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 80.f)];
         [self registerClass:[ADKArtistCell class] forCellReuseIdentifier:REUSE];
     }
     return self;

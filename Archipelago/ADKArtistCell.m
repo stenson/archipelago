@@ -15,6 +15,8 @@
 }
 @end
 
+#define BLUE [UIColor colorWithRed:0.4f green:0.5f blue:1.f alpha:0.8f]
+
 @implementation ADKArtistCell
 
 + (NSAttributedString *)attributedStringForArtistName:(NSString *)artistName
@@ -23,7 +25,7 @@
     style.alignment = NSTextAlignmentCenter;
     
     return [[NSAttributedString alloc] initWithString:artistName attributes:@{
-        NSForegroundColorAttributeName:[UIColor colorWithRed:0.4f green:0.5f blue:1.f alpha:1.f],
+        NSForegroundColorAttributeName:[UIColor whiteColor],
         NSFontAttributeName:[UIFont fontWithName:@"AvenirNext-Bold" size:15.f],
         NSParagraphStyleAttributeName: style,
     }];
@@ -37,7 +39,9 @@
         
         self.backgroundColor = [UIColor clearColor];
         self.opaque = NO;
-        self.contentView.backgroundColor = [UIColor colorWithWhite:1.f alpha:0.95f];
+        self.selectedBackgroundView = [[UIView alloc] init];
+        self.selectedBackgroundView.backgroundColor = BLUE;
+        self.contentView.backgroundColor = BLUE;
     }
     return self;
 }

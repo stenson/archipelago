@@ -38,6 +38,8 @@
     _navBar = [[UINavigationBar alloc] initWithFrame:CGRectZero];
     _navBar.tintColor = [UIColor whiteColor];
     _navBar.barTintColor = [UIColor colorWithRed:1.0 green:0.3 blue:0.4 alpha:1.0];
+    _navBar.barTintColor = [UIColor colorWithRed:0.f green:0.6f blue:0.5f alpha:1.f];
+    //_navBar.barTintColor = [UIColor colorWithWhite:1.f alpha:1.f];
     _navBar.delegate = self;
     [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:@"Countries"] animated:NO];
     
@@ -84,7 +86,7 @@
         _forceLayout = NO;
         
         _navBar.frame = CGRectTake(self.view.bounds, 64.f, CGRectMinYEdge);
-        _table.frame = CGRectTake(self.view.bounds, -64.f, CGRectMaxYEdge);
+        _table.frame = self.view.bounds;
         _artists.frame = _table.frame;
         
         _map.frame = self.view.bounds;
@@ -160,8 +162,9 @@
     
     [self performLocalSearchForNaturalLanguageQuery:country completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
         MKCoordinateRegion region = response.boundingRegion;
-        region.span = MKCoordinateSpanMake(region.span.latitudeDelta * 2.f, region.span.longitudeDelta);
-        [_map setRegion:response.boundingRegion animated:YES];
+        NSLog(@"%f %f", region.center.latitude, region.span.latitudeDelta);
+        region.span = MKCoordinateSpanMake(region.span.latitudeDelta * 4.f, region.span.longitudeDelta);
+        [_map setRegion:region animated:YES];
     }];
     
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];

@@ -9,6 +9,8 @@
 #import "ADKCountryCell.h"
 #import "CGGeometryAdditions.h"
 
+#define PINK [UIColor colorWithRed:1.f green:0.4f blue:0.5f alpha:0.8f]
+
 @implementation ADKCountryCell
 
 + (CGRect)boundingRectForWidth:(CGFloat)width attributedCountryName:(NSAttributedString *)attributedCountryName
@@ -20,7 +22,7 @@
 {
     NSDictionary *attrs = @{
         NSFontAttributeName:[UIFont fontWithName:@"AvenirNext-Bold" size:18.f],
-        NSForegroundColorAttributeName:[UIColor colorWithRed:1.f green:0.4f blue:0.5f alpha:1.f]
+        NSForegroundColorAttributeName:[UIColor whiteColor],
     };
     return [[NSAttributedString alloc] initWithString:countryName attributes:attrs];
 }
@@ -30,8 +32,10 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         self.selectedBackgroundView = [[UIView alloc] init];
-        self.selectedBackgroundView.backgroundColor = [UIColor whiteColor];
-        self.contentView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.95f];
+        //self.selectedBackgroundView.backgroundColor = [UIColor whiteColor];
+        self.selectedBackgroundView.backgroundColor = PINK;
+        self.contentView.backgroundColor = PINK;
+        //self.contentView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.95f];
     }
     return self;
 }
