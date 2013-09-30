@@ -20,13 +20,14 @@
 #define RDIO_API_KEY @"wfjgaquwyy79wt5ezamvkxfg"
 #define RDIO_API_SECRET @"vk3CFKTZK5"
 
-@interface ADKViewController ()<UITableViewDelegate, MKMapViewDelegate, UINavigationBarDelegate> {
+@interface ADKViewController ()<UITableViewDelegate, MKMapViewDelegate, UINavigationBarDelegate, RdioDelegate, RDPlayerDelegate, RDAPIRequestDelegate> {
     UINavigationBar *_navBar;
     BOOL _forceLayout;
     MKMapView *_map;
     ADKCountriesTable *_table;
     ADKArtistsTable *_artists;
     MKPointAnnotation *_currentCountry;
+    Rdio *_rdio;
 }
 @end
 
@@ -76,6 +77,9 @@
     [self.view addSubview:_artists];
     [self.view addSubview:_table];
     [self.view addSubview:_navBar];
+    
+    _rdio = [[Rdio alloc] initWithConsumerKey:RDIO_API_KEY andSecret:RDIO_API_SECRET delegate:self];
+    _rdio.player.delegate = self;
 }
 
 - (void)centerMapAnimated:(BOOL)animated
@@ -190,7 +194,13 @@
 - (void)centerMapOnCountry:(NSDictionary *)countryData
 {
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake([countryData[@"lat"] floatValue], [countryData[@"lon"] floatValue]);
-    MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(center.latitude, center.longitude + 15.f), MKCoordinateSpanMake(50.f, 50.f));
+    CLLocationCoordinate2D adjusted = CLLocationCoordinate2DMake(center.latitude, center.longitude + 15.f);
+    if (CLLocationCoordinate2DIsValid(adjusted) == NO) {
+        adjusted = center;
+    }
+    
+    MKCoordinateRegion region = MKCoordinateRegionMake(adjusted, MKCoordinateSpanMake(50.f, 50.f));
+    
     [_map setRegion:[_map regionThatFits:region] animated:YES];
     
     [_map removeAnnotations:[_map annotations]];
@@ -202,6 +212,12 @@
 - (void)zoomToArtistAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *artistData = _artists.artists[indexPath.row];
+    
+    NSArray *foreignIds = artistData[@"foreign_ids"];
+    if (foreignIds.count > 0) {
+        NSString *rdioId = [foreignIds[0][@"foreign_id"] stringByReplacingOccurrencesOfString:@"rdio-US:artist:" withString:@""];
+        [_rdio callAPIMethod:@"getTracksForArtist" withParameters:@{@"artist": rdioId} delegate:self];
+    }
     
     [_artists animateCellExitsWithCompletion:nil];
     _artists.userInteractionEnabled = NO;
@@ -291,10 +307,42 @@
     _artists.userInteractionEnabled = YES;
 }
 
-//- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+#pragma mark - RdioDelegate
+
+- (void)rdioDidAuthorizeUser:(NSDictionary *)user withAccessToken:(NSString *)accessToken
+{
+    
+}
+
+- (void)rdioAuthorizationFailed:(NSString *)error
+{
+    
+}
+
+#pragma mark - RDPlayerDelegate
+
+- (void)rdioPlayerChangedFromState:(RDPlayerState)oldState toState:(RDPlayerState)newState
+{
+    
+}
+
+//- (BOOL)rdioPlayerCouldNotStreamTrack:(NSString *)trackKey
 //{
-//    MKPinAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
-//    return pin;
+//    
 //}
+
+#pragma mark - RDAPIRequestDelegate
+
+- (void)rdioRequest:(RDAPIRequest *)request didLoadData:(NSArray *)data
+{
+    NSLog(@"rdio request load: %@ %@", request, data);
+    [_rdio.player stop];
+    [_rdio.player playSource:data[0][@"key"]];
+}
+
+- (void)rdioRequest:(RDAPIRequest *)request didFailWithError:(NSError *)error
+{
+    NSLog(@"rdio request error: %@", error);
+}
 
 @end
