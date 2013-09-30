@@ -47,6 +47,16 @@
     [self performSelector:@selector(animateCellEntrances) withObject:nil afterDelay:0.25f];
 }
 
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    BOOL inside = [super pointInside:point withEvent:event];
+    if (inside) {
+        return [(ADKArtistCell *)[self cellForRowAtIndexPath:[self indexPathForRowAtPoint:point]] xCoordinateInside:point.x];
+    } else {
+        return NO;
+    }
+}
+
 - (void)animateCellEntrances
 {
     _entranceAnimated = YES;
@@ -60,15 +70,20 @@
     }
 }
 
-- (void)animateCellExits
+- (void)animateCellExitsWithCompletion:(void (^)(BOOL finished))completion
 {
+    NSInteger count = [self.visibleCells count];
     CGFloat delay = 0.f;
     for (ADKArtistCell *cell in [self.visibleCells reverseObjectEnumerator]) {
+        count--;
         [UIView animateWithDuration:0.25f delay:(delay += 0.05f) options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             cell.transform = CGAffineTransformMakeTranslation(cell.contentView.frame.size.width, 0.f);
         } completion:^(BOOL finished) {
             cell.transform = CGAffineTransformIdentity;
             cell.hidden = YES;
+            if (count == 0 && completion) {
+                completion(finished);
+            }
         }];
     }
 }

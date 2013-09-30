@@ -12,6 +12,7 @@
 
 @property (nonatomic, copy) NSArray *artists;
 
-- (void)animateCellExits;
+- (void)animateCellEntrances;
+- (void)animateCellExitsWithCompletion:(void (^)(BOOL finished))completion;
 
 @end

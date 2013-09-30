@@ -10,4 +10,6 @@
 
 @interface ADKCountriesTable : UITableView
 
+@property (nonatomic, copy) NSArray *countries;
+
 @end

@@ -55,6 +55,11 @@
     [self setNeedsLayout];
 }
 
+- (BOOL)xCoordinateInside:(CGFloat)x
+{
+    return CGRectContainsPoint(self.contentView.frame, CGPointMake(x, 20.f));
+}
+
 - (void)layoutSubviews
 {
     if (_forceLayout == YES) {

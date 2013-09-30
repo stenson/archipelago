@@ -29,6 +29,12 @@
 		98E4365317F5DEE9000B7157 /* countries.json in Resources */ = {isa = PBXBuildFile; fileRef = 98E4365217F5DEE9000B7157 /* countries.json */; };
 		98E4365617F60C8F000B7157 /* ADKCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 98E4365517F60C8F000B7157 /* ADKCountryCell.m */; };
 		98E4365E17F613C1000B7157 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98E4365D17F613C1000B7157 /* QuartzCore.framework */; };
+		98EC3CBA17F93175007574B7 /* Rdio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98EC3CB917F93175007574B7 /* Rdio.framework */; };
+		98EC3CBB17F931B1007574B7 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98E4365B17F613BB000B7157 /* CFNetwork.framework */; };
+		98EC3CBD17F931BE007574B7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98EC3CBC17F931BE007574B7 /* SystemConfiguration.framework */; };
+		98EC3CBF17F931C9007574B7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98EC3CBE17F931C9007574B7 /* AudioToolbox.framework */; };
+		98EC3CC117F931D0007574B7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98EC3CC017F931D0007574B7 /* Security.framework */; };
+		98EC3CC317F9B1A5007574B7 /* countries_dbf.json in Resources */ = {isa = PBXBuildFile; fileRef = 98EC3CC217F9B1A5007574B7 /* countries_dbf.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +82,11 @@
 		98E4365517F60C8F000B7157 /* ADKCountryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADKCountryCell.m; sourceTree = "<group>"; };
 		98E4365B17F613BB000B7157 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		98E4365D17F613C1000B7157 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		98EC3CB917F93175007574B7 /* Rdio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Rdio.framework; sourceTree = "<group>"; };
+		98EC3CBC17F931BE007574B7 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		98EC3CBE17F931C9007574B7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		98EC3CC017F931D0007574B7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		98EC3CC217F9B1A5007574B7 /* countries_dbf.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = countries_dbf.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,8 +94,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98E4365E17F613C1000B7157 /* QuartzCore.framework in Frameworks */,
+				98EC3CC117F931D0007574B7 /* Security.framework in Frameworks */,
+				98EC3CBF17F931C9007574B7 /* AudioToolbox.framework in Frameworks */,
+				98EC3CBD17F931BE007574B7 /* SystemConfiguration.framework in Frameworks */,
+				98EC3CBB17F931B1007574B7 /* CFNetwork.framework in Frameworks */,
 				98E4361417F5BC40000B7157 /* CoreGraphics.framework in Frameworks */,
+				98E4365E17F613C1000B7157 /* QuartzCore.framework in Frameworks */,
+				98EC3CBA17F93175007574B7 /* Rdio.framework in Frameworks */,
 				98E4361617F5BC40000B7157 /* UIKit.framework in Frameworks */,
 				98E4361217F5BC40000B7157 /* Foundation.framework in Frameworks */,
 				85F01FA2C58041B0A1162B74 /* libPods.a in Frameworks */,
@@ -127,6 +143,10 @@
 		98E4361017F5BC40000B7157 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				98EC3CB917F93175007574B7 /* Rdio.framework */,
+				98EC3CC017F931D0007574B7 /* Security.framework */,
+				98EC3CBE17F931C9007574B7 /* AudioToolbox.framework */,
+				98EC3CBC17F931BE007574B7 /* SystemConfiguration.framework */,
 				98E4365D17F613C1000B7157 /* QuartzCore.framework */,
 				98E4365B17F613BB000B7157 /* CFNetwork.framework */,
 				98E4361117F5BC40000B7157 /* Foundation.framework */,
@@ -152,6 +172,7 @@
 		98E4361817F5BC40000B7157 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				98EC3CC217F9B1A5007574B7 /* countries_dbf.json */,
 				98E4365217F5DEE9000B7157 /* countries.json */,
 				98E4361917F5BC40000B7157 /* Archipelago-Info.plist */,
 				98E4361A17F5BC40000B7157 /* InfoPlist.strings */,
@@ -292,6 +313,7 @@
 				98E4362517F5BC40000B7157 /* Main_iPhone.storyboard in Resources */,
 				98E4365317F5DEE9000B7157 /* countries.json in Resources */,
 				98E4361C17F5BC40000B7157 /* InfoPlist.strings in Resources */,
+				98EC3CC317F9B1A5007574B7 /* countries_dbf.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,6 +514,28 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Archipelago/Archipelago-Prefix.pch";
 				INFOPLIST_FILE = "Archipelago/Archipelago-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					CFNetwork,
+					"-framework",
+					CoreGraphics,
+					"-framework",
+					Foundation,
+					"-framework",
+					MapKit,
+					"-framework",
+					MobileCoreServices,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Reveal,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-Wunused-function";
 				WRAPPER_EXTENSION = app;
@@ -511,6 +555,28 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Archipelago/Archipelago-Prefix.pch";
 				INFOPLIST_FILE = "Archipelago/Archipelago-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					CFNetwork,
+					"-framework",
+					CoreGraphics,
+					"-framework",
+					Foundation,
+					"-framework",
+					MapKit,
+					"-framework",
+					MobileCoreServices,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Reveal,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-Wunused-function";
 				WRAPPER_EXTENSION = app;

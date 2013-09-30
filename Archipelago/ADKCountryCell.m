@@ -47,6 +47,11 @@
     [self setNeedsLayout];
 }
 
+- (BOOL)xCoordinateInside:(CGFloat)x
+{
+    return CGRectContainsPoint(self.contentView.bounds, CGPointMake(x, 20.f));
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];

@@ -15,4 +15,6 @@
 
 @property (nonatomic, copy) NSString *countryName;
 
+- (BOOL)xCoordinateInside:(CGFloat)x;
+
 @end

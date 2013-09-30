@@ -11,7 +11,6 @@
 #import "ADKCountryCell.h"
 
 @interface ADKCountriesTable ()<UITableViewDataSource, UITableViewDelegate> {
-    NSArray *_countries;
 }
 @end
 
@@ -39,11 +38,22 @@
 - (NSArray *)countriesFromJSON
 {
     NSError *error;
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"countries" ofType:@"json"];
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"countries_dbf" ofType:@"json"];
     NSString *countries = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
     NSData *data = [countries dataUsingEncoding:NSUTF8StringEncoding];
     NSArray *array = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
     return array;
+}
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    BOOL inside = [super pointInside:point withEvent:event];
+    if (inside) {
+        ADKCountryCell *cell = (ADKCountryCell *)[self cellForRowAtIndexPath:[self indexPathForRowAtPoint:point]];
+        return [cell xCoordinateInside:point.x];
+    } else {
+        return NO;
+    }
 }
 
 #pragma mark - UITableViewDataSource

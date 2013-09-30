@@ -14,4 +14,6 @@
 
 @property (nonatomic, copy) NSString *name;
 
+- (BOOL)xCoordinateInside:(CGFloat)x;
+
 @end

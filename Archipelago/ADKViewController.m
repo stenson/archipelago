@@ -9,12 +9,16 @@
 #import "ADKViewController.h"
 #import <MBXMapKit/MBXMapKit.h>
 #import <AFNetworking/AFHTTPRequestOperationManager.h>
+#import <AFNetworking/AFURLRequestSerialization.h>
 #import "CGGeometryAdditions.h"
 #import "ADKCountriesTable.h"
 #import "ADKCountryCell.h"
 #import "ADKArtistsTable.h"
+#import <Rdio/Rdio.h>
 
 #define ECHONEST_API_KEY @"HEJZB8PY3CZFC1I8R"
+#define RDIO_API_KEY @"wfjgaquwyy79wt5ezamvkxfg"
+#define RDIO_API_SECRET @"vk3CFKTZK5"
 
 @interface ADKViewController ()<UITableViewDelegate, MKMapViewDelegate, UINavigationBarDelegate> {
     UINavigationBar *_navBar;
@@ -22,10 +26,12 @@
     MKMapView *_map;
     ADKCountriesTable *_table;
     ADKArtistsTable *_artists;
+    MKPointAnnotation *_currentCountry;
 }
 @end
 
 #define MAP_ID @"stenson.map-poqvzkjo"
+//#define MAP_ID @"stenson.map-k99f0609"
 
 @implementation ADKViewController
 
@@ -53,6 +59,7 @@
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSFontAttributeName:[din fontWithSize:18.f]} forState:UIControlStateNormal];
     
     _map = [[MKMapView alloc] initWithFrame:self.view.bounds];
+    //_map.mapType = MKMapTypeHybrid;
     //_map = [[MBXMapView alloc] initWithFrame:self.view.bounds mapID:MAP_ID showDefaultBaseLayer:NO];
     CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(19, -123);
     MKCoordinateRegion adjustedRegion = [_map regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 100, 100)];
@@ -63,6 +70,7 @@
     _table.delegate = self;
     
     _artists = [[ADKArtistsTable alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _artists.delegate = self;
     
     [self.view addSubview:_map];
     [self.view addSubview:_artists];
@@ -106,21 +114,8 @@
 
 - (void)addEchonestArtistResponseToMap:(NSDictionary *)response
 {
+    _artists.hidden = NO;
     NSArray *artists = response[@"response"][@"artists"];
-    
-    for (NSDictionary *artist in artists) {
-        [self performLocalSearchForNaturalLanguageQuery:artist[@"artist_location"][@"location"] completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
-            if (response) {
-                MKPointAnnotation *point = [[MKPointAnnotation alloc] init];
-                [point setCoordinate:response.boundingRegion.center];
-                [point setTitle:artist[@"name"]];
-                [_map addAnnotation:point];
-            } else {
-                NSLog(@"dud");
-            }
-        }];
-    }
-    
     _artists.artists = artists;
 }
 
@@ -136,12 +131,22 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    //[tableView deselectRowAtIndexPath:indexPath animated:NO];
+
+    if (tableView == _table) {
+        [self zoomInToCountryAtIndexPath:indexPath];
+    } else if (tableView == _artists) {
+        [self zoomToArtistAtIndexPath:indexPath];
+    }
+}
+
+- (void)zoomInToCountryAtIndexPath:(NSIndexPath *)indexPath
+{
+    _artists.userInteractionEnabled = YES;
+    NSDictionary *countryData = _table.countries[indexPath.row];
     
-    NSString *country = [(ADKCountryCell *)[_table cellForRowAtIndexPath:indexPath] countryName];
-    
-    UITableViewCell *selectedCell = [tableView cellForRowAtIndexPath:indexPath];
-    NSArray *cells = [tableView visibleCells];
+    UITableViewCell *selectedCell = [_table cellForRowAtIndexPath:indexPath];
+    NSArray *cells = [_table visibleCells];
     NSTimeInterval delay = 0.f;
     for (UITableViewCell *cell in cells) {
         if (cell != selectedCell) {
@@ -158,35 +163,107 @@
         _table.hidden = YES;
     }];
     
-    [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:country] animated:YES];
+    NSString *countryName = countryData[@"name"];
+    [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:countryName] animated:YES];
     
-    [self performLocalSearchForNaturalLanguageQuery:country completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
-        MKCoordinateRegion region = response.boundingRegion;
-        NSLog(@"%f %f", region.center.latitude, region.span.latitudeDelta);
-        region.span = MKCoordinateSpanMake(region.span.latitudeDelta * 4.f, region.span.longitudeDelta);
-        [_map setRegion:region animated:YES];
-    }];
+    [self centerMapOnCountry:countryData];
     
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    NSDictionary *parameters = @{
-        @"api_key": ECHONEST_API_KEY,
-        @"format": @"json",
-        @"artist_location": [NSString stringWithFormat:@"country:%@", country],
-        @"bucket": @"artist_location",
-    };
+    NSString *safeCountry = [countryName stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSString *parameters = [NSString stringWithFormat:@"?api_key=%@&format=json&artist_location=country:%@&bucket=artist_location&bucket=id:rdio-US&results=50", ECHONEST_API_KEY, safeCountry];
+    NSString *url = [@"http://developer.echonest.com/api/v4/artist/search" stringByAppendingString:parameters];
     
-    [manager GET:@"http://developer.echonest.com/api/v4/artist/search" parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [manager GET:url parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         [self addEchonestArtistResponseToMap:responseObject];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"Error: %@", error);
     }];
 }
 
+- (void)zoomOutToCountry
+{
+    _artists.userInteractionEnabled = YES;
+    NSDictionary *countryData = _table.countries[[_table indexPathForSelectedRow].row];
+    [self centerMapOnCountry:countryData];
+}
+
+- (void)centerMapOnCountry:(NSDictionary *)countryData
+{
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake([countryData[@"lat"] floatValue], [countryData[@"lon"] floatValue]);
+    MKCoordinateRegion region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(center.latitude, center.longitude + 15.f), MKCoordinateSpanMake(50.f, 50.f));
+    [_map setRegion:[_map regionThatFits:region] animated:YES];
+    
+    [_map removeAnnotations:[_map annotations]];
+    MKPointAnnotation *currentCountry = [[MKPointAnnotation alloc] init];
+    currentCountry.coordinate = center;
+    [_map addAnnotation:currentCountry];
+}
+
+- (void)zoomToArtistAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *artistData = _artists.artists[indexPath.row];
+    
+    [_artists animateCellExitsWithCompletion:nil];
+    _artists.userInteractionEnabled = NO;
+    
+    [_navBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:artistData[@"name"]] animated:YES];
+    
+    [self performLocalSearchForNaturalLanguageQuery:artistData[@"artist_location"][@"location"] completionHandler:^(MKLocalSearchResponse *response, NSError *error) {
+        if (response) {
+            MKPointAnnotation *point = [[MKPointAnnotation alloc] init];
+            [point setCoordinate:response.boundingRegion.center];
+            [point setTitle:artistData[@"name"]];
+            [_map removeAnnotations:[_map annotations]];
+            [_map addAnnotation:point];
+            [_map setRegion:[self adjustedRegionFromRegion:response.boundingRegion pushFromEdge:CGRectMaxYEdge] animated:YES];
+        } else {
+            NSLog(@"dud");
+        }
+    }];
+}
+
+- (MKCoordinateRegion)adjustedRegionFromRegion:(MKCoordinateRegion)originalRegion pushFromEdge:(CGRectEdge)edge
+{
+    MKCoordinateRegion region = originalRegion;
+    switch (edge) {
+        case CGRectMaxXEdge: {
+            region.center.longitude += region.span.longitudeDelta/1.5f;
+        } break;
+        case CGRectMinXEdge: {
+            region.center.longitude -= region.span.longitudeDelta/1.5f;
+        } break;
+        case CGRectMinYEdge: {
+            region.center.latitude += region.span.latitudeDelta/1.5f;
+        } break;
+        case CGRectMaxYEdge: {
+            region.center.latitude -= region.span.latitudeDelta/1.5f;
+        } break;
+    }
+    
+    region.span.longitudeDelta = region.span.longitudeDelta * 3.f;
+    return region;
+}
+
 #pragma mark - UINavigationBarDelegate
 
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item
 {
-    [_artists animateCellExits];
+    if (navigationBar.items.count > 2) {
+        [self popArtistSelection];
+    } else {
+        [self popCountrySelection];
+    }
+    
+    return YES;
+}
+
+- (void)popCountrySelection
+{
+    _artists.userInteractionEnabled = NO;
+    [_artists animateCellExitsWithCompletion:^(BOOL finished) {
+        _artists.hidden = YES;
+        [_artists setContentOffset:CGPointMake(0.f, 0.f)];
+    }];
     
     _table.hidden = NO;
     [UIView animateWithDuration:0.25f animations:^{
@@ -205,30 +282,19 @@
             cell.transform = CGAffineTransformIdentity;
         } completion:nil];
     }
-    return YES;
 }
 
-//- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+- (void)popArtistSelection
+{
+    [self zoomOutToCountry];
+    [_artists animateCellEntrances];
+    _artists.userInteractionEnabled = YES;
+}
+
+//- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
 //{
-//    [_artists animateCellExits];
-//    
-//    _table.hidden = NO;
-//    [UIView animateWithDuration:0.25f animations:^{
-//        _table.alpha = 1.f;
-//    } completion:^(BOOL finished) {
-//        _table.userInteractionEnabled = YES;
-//    }];
-//    
-//    [self centerMapAnimated:YES];
-//    [_map removeAnnotations:[_map annotations]];
-//    
-//    NSArray *cells = [_table visibleCells];
-//    NSTimeInterval delay = cells.count * 0.05f;
-//    for (UITableViewCell *cell in cells) {
-//        [UIView animateWithDuration:0.25f delay:delay -= 0.05f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-//            cell.transform = CGAffineTransformIdentity;
-//        } completion:nil];
-//    }
+//    MKPinAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:nil];
+//    return pin;
 //}
 
 @end
